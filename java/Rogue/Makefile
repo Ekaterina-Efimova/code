@@ -1,12 +1,22 @@
-all: build run clean
+all: clean install build run
 
 build:
-	docker build -t rogue .
+	mvn clean package
 
-run: 
-	docker run --rm -it rogue
+run:
+	mvn exec:java -Dexec.mainClass="Rogue.App"
 
 clean:
-	docker rmi rogue
+	mvn clean
 
-.PHONY: all build run
+install:
+	mvn install
+
+install-java:
+	sudo apt update
+	sudo apt install default-jdk
+
+install-maven:
+	sudo apt install maven
+
+.PHONY: all build run clean install test
