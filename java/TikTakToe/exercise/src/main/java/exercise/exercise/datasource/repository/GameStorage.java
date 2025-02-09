@@ -26,7 +26,7 @@ public class GameStorage {
 
   public GameEntity getGame(UUID gameId) {
     if (!games.containsKey(gameId)) {
-      throw new RuntimeException("Game not found");
+      return null;
     }
     return games.get(gameId);
   }

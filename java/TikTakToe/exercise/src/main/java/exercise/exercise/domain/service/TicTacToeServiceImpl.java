@@ -3,7 +3,6 @@ package exercise.exercise.domain.service;
 import java.util.stream.IntStream;
 
 import exercise.exercise.domain.model.Game;
-import exercise.exercise.web.model.GameWeb;
 
 public class TicTacToeServiceImpl implements TicTacToeService {
   private int[][] tempBoard;
@@ -12,15 +11,9 @@ public class TicTacToeServiceImpl implements TicTacToeService {
     tempBoard = new int[3][3];
   }
 
-  public Game getNextMove(Game game, GameWeb gameWeb) {
+  public Game getNextMove(Game game, String move) {
     if (game.getMessage() == null) {
-
-      if (!validateBoard(gameWeb)) {
-        game.setMessage("Некорректное поле игрока");
-        return game;
-      }
-
-      game.setMove(gameWeb.getMove());
+      game.setMove(move);
       tempBoard = copyBoard(game);
       int[] computerMove = minimax();
 
@@ -87,12 +80,12 @@ public class TicTacToeServiceImpl implements TicTacToeService {
     return copiedBoard;
   }
 
-  private boolean validateBoard(GameWeb gameWeb) {
-    return IntStream.range(0, 3)
-        .allMatch(i -> IntStream.range(0, 3)
-            .allMatch(j -> gameWeb.getElement(i, j) == 0));
+  // private boolean validateBoard(char[][] old) {
+  //   return IntStream.range(0, 3)
+  //       .allMatch(i -> IntStream.range(0, 3)
+  //           .allMatch(j -> old(i, j) == 0));
 
-  }
+  // }
 
   private boolean validateBoard(Game game) {
     return IntStream.range(0, 3)

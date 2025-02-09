@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Крестики-нолики</title>
     <style>
@@ -34,19 +35,22 @@
         <div th:if="${game.message}" class="error-message">
             <p th:text="${game.message}"></p>
         </div>
+        <form th:action="@{/game/new}" method="post">
+            <button type="submit">Новая игра</button>
+        </form>
         <form th:action="@{/game/{gameId}(gameId=${game.gameId})}" method="post">
-            <input type="hidden" name="gameId" th:value="${game.gameId}"/>
+            <input type="hidden" name="gameId" th:value="${game.gameId}" />
             <div class="board">
                 <th:block th:each="row,i : ${game.board}">
                     <th:block th:each="cell,j : ${row}">
                         <button type="submit" class="cell" th:name="'move'" th:value="${i.index + ',' + j.index}"
                             th:text="${cell == 1 ? 'X' : (cell == 2 ? 'O' : '')}"
-                            th:disabled="${cell != 0 || game.message != null}">
+                            th:disabled="${cell != 0 || game.message != null || !isGameActive}">
+                            <!-- Условие для кнопок -->
                         </button>
                     </th:block>
                 </th:block>
             </div>
-            <button type="button" onclick="window.location.href='/game/new'">Новая игра</button>
         </form>
     </div>
 </body>

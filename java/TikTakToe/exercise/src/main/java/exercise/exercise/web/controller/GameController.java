@@ -1,8 +1,6 @@
 package exercise.exercise.web.controller;
 
-import exercise.exercise.datasource.service.GameRepositoryServiseImpl;
-import exercise.exercise.domain.model.Game;
-import exercise.exercise.domain.service.TicTacToeService;
+import exercise.exercise.di.DependencyGraphConfiguration;
 import exercise.exercise.web.mapper.GameMapperWeb;
 import exercise.exercise.web.model.GameWeb;
 
@@ -16,28 +14,33 @@ import java.util.UUID;
 @Controller
 @RequestMapping("/game")
 public class GameController {
-  private final TicTacToeService ticTacToeService;
-  private final GameRepositoryServiseImpl gameRepositoryServiseImpl;
+  private final DependencyGraphConfiguration context;
 
-  public GameController(TicTacToeService ticTacToeService, GameRepositoryServiseImpl gameRepositoryServiseImpl) {
-    this.ticTacToeService = ticTacToeService;
-    this.gameRepositoryServiseImpl = gameRepositoryServiseImpl;
+  public GameController() {
+    context = new DependencyGraphConfiguration();
+  }
+
+  @PostMapping("/new")
+  public String newGame(Model model) {
+    GameWeb newGame = new GameWeb();
+    context.gameRepositoryService().saveCurrentGame(GameMapperWeb.toDomain(newGame));
+    model.addAttribute("game", newGame);
+    model.addAttribute("isGameActive", true);
+    return "game";
   }
 
   @GetMapping("/new")
-  public String showGame(Model model) {
-    GameWeb newGame = new GameWeb();
-    gameRepositoryServiseImpl.saveCurrentGame(GameMapperWeb.toDomain(newGame));
-    model.addAttribute("game", newGame);
+  public String showGame(Model model, @Autowired GameWeb gameWeb) {
+    model.addAttribute("game", gameWeb);
+    model.addAttribute("isGameActive", false); 
     return "game";
   }
 
   @PostMapping("/{gameId}")
   public String makeMove(@PathVariable("gameId") UUID gameId, @Autowired GameWeb gameWeb, Model model) {
-    Game game = gameRepositoryServiseImpl.findGameById(gameId);
-    model.addAttribute("game", GameMapperWeb.toWeb(ticTacToeService.getNextMove(game, gameWeb)));
-    gameRepositoryServiseImpl.saveCurrentGame(game);
+    model.addAttribute("game", GameMapperWeb.toWeb(context.gameRepositoryService().saveCurrentGame(context
+        .ticTacToeService().getNextMove(context.gameRepositoryService().findGameById(gameId), gameWeb.getMove()))));
+    model.addAttribute("isGameActive", true);
     return "game";
   }
-
 }
